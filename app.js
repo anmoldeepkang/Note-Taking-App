@@ -151,3 +151,22 @@ function getColor(color) {
   }
   return col;
 }
+
+//Drap and drop using JQuery
+$(function() {
+            $( "#notes" ).sortable({
+            update: function(event, ui) {
+                getIdsOfNotes();
+            }//end update
+            });
+        });
+
+        function getIdsOfNotes() {
+            var values = [];
+            $('.note').each(function (index) {
+                values.push($(this).attr("id")
+                        .replace("note-", ""));
+            });
+
+            $('#outputvalues').val(values);
+        }
