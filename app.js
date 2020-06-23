@@ -13,6 +13,9 @@ function addNote(){
     newNote.setAttribute("style","background:"+getColor(backgroundColor));
     newNote.appendChild(getEditButton());
     newNote.appendChild(getDeleteButton());
+    newNote.setAttribute("draggable","true");
+    newNote.setAttribute("ondragover","dragOver(event)");
+    newNote.setAttribute("ondragstart","dragStart(event)");
     var par=document.createElement("p");
     par.innerText=text;
     newNote.appendChild(par);
@@ -151,22 +154,25 @@ function getColor(color) {
   }
   return col;
 }
+var noteBeingDragged;
 
-//Drap and drop using JQuery
-$(function() {
-            $( "#notes" ).sortable({
-            update: function(event, ui) {
-                getIdsOfNotes();
-            }//end update
-            });
-        });
+function dragOver(e) {
+  if (isBefore(noteBeingDragged, e.target))
+    e.target.parentNode.insertBefore(noteBeingDragged, e.target);
+  else
+    e.target.parentNode.insertBefore(noteBeingDragged, e.target.nextSibling);
+}
 
-        function getIdsOfNotes() {
-            var values = [];
-            $('.note').each(function (index) {
-                values.push($(this).attr("id")
-                        .replace("note-", ""));
-            });
+function dragStart(e) {
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", null);
+  noteBeingDragged = e.target;
+}
 
-            $('#outputvalues').val(values);
-        }
+function isBefore(el1, el2) {
+  if (el2.parentNode === el1.parentNode)
+    for (var cur = el1.previousSibling; cur && cur.nodeType !== 9; cur = cur.previousSibling)
+      if (cur === el2)
+        return true;
+  return false;
+}
